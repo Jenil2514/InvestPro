@@ -1,29 +1,45 @@
+create schema investpro
+set search_path to investpro
+
 CREATE TABLE Users (
     User_ID CHAR(10) PRIMARY KEY,
     Pan_No CHAR(10) UNIQUE NOT NULL,
     Email VARCHAR(50) UNIQUE NOT NULL,
-    Name CHAR(50) NOT NULL,
+    Name CHAR(30) NOT NULL,
     Contect_No CHAR(10) UNIQUE NOT NULL,
-    Hold_Balance DECIMAL(10,2)
-    Available_Balance DECIMAL(10,2) ,
-    Blocked_Balance DECIMAL(10,2) 
+    Available_Balance DECIMAL(10,2) 
 );
 
 CREATE TABLE Account(
     Account_No VARCHAR(16) PRIMARY KEY,
-    Bank_Name VARCHAR(30) NOT NULL,
     IFSC CHAR(11) UNIQUE NOT NULL,
-    User_ID CHAR(10) FOREIGN KEY REFERENCES User(User_ID)
+    User_ID CHAR(10) ,
+    FOREIGN KEY(User_ID) REFERENCES Users(User_ID)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE 
 );
+
+create table Bank_info(
+	IFSC CHAR(11) PRIMARY KEY REFERENCES account(IFSC)
+	ON UPDATE CASCADE,
+	bank_name VARCHAR(30) NOT NULL,
+    PRIMARY KEY(IFSC)
+);
+
 
 CREATE TABLE Transactions (
     Transaction_ID CHAR(12) PRIMARY KEY,
     Transaction_Time TIMESTAMP,
-    User_ID CHAR(10) FOREIGN KEY REFERENCES Users(User_ID),
+    User_ID CHAR(10) ,
+    FOREIGN KEY(User_ID) REFERENCES Users(User_ID)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE 
 );
 
 CREATE TABLE Bank_Wallet (
-    Transaction_ID CHAR(12) FOREIGN KEY REFERENCES Transactions(Transaction_ID),
+    Transaction_ID CHAR(12) REFERENCES Transactions(Transaction_ID)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
     Bank_Acc_No VARCHAR(16) NOT NULL,
     Amount DECIMAL(10,2) NOT NULL,
     Transaction_Type VARCHAR(20) NOT NULL,
@@ -31,133 +47,188 @@ CREATE TABLE Bank_Wallet (
 );
 
 CREATE TABLE Wallet_Stock(
-    Transaction_ID CHAR(12) FOREIGN KEY REFERENCES Transactions(Transaction_ID),
-    Stock_Symbol VARCHAR(10) FOREIGN KEY REFERENCES Stocks(Stock_Symbol),
+    Transaction_ID CHAR(12) ,
+    Stock_Symbol VARCHAR(30) ,
     Order_Type VARCHAR(15) NOT NULL,
-    Total_Amount DECIMAL(10,2) NOT NULL,
     Qty VARCHAR(10) NOT NULL,
-    Current_Price DECIMAL(10,2) NOT NULL,
-    Order_ID CHAR(10) FOREIGN KEY REFERENCES Order(Order_ID),
-    PRIMARY KEY(Transaction_ID)
+    Buy_Price DECIMAL(10,2) NOT NULL,
+    Order_ID CHAR(10) ,
+    PRIMARY KEY(Transaction_ID),
+    FOREIGN KEY(Order_ID) REFERENCES Orders(Order_ID)
+    ON UPDATE CASCADE,
+    FOREIGN KEY(Transaction_ID) REFERENCES Transactions(Transaction_ID)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+
+    FOREIGN KEY(Stock_Symbol) REFERENCES Stocks(Stock_Symbol)
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE Watchlist (
-    User_ID CHAR(10) FOREIGN KEY REFERENCES Users(User_ID),
-    Stock_Symbol VARCHAR(10) FOREIGN KEY REFERENCES Stocks(Stock_Symbol),
-    PRIMARY KEY (User_ID,Stock_Symbol)
+    User_ID CHAR(10) ,
+    Stock_Symbol VARCHAR(30) ,
+    PRIMARY KEY (User_ID,Stock_Symbol),
+    FOREIGN KEY(User_ID) REFERENCES Users(User_ID)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+    FOREIGN KEY(Stock_Symbol) REFERENCES Stocks(Stock_Symbol)
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE Holdings (
-    User_ID CHAR(10) FOREIGN KEY REFERENCES Users(User_ID),
-    Stock_Symbol VARCHAR(10) FOREIGN KEY REFERENCES Stocks(Stock_Symbol),
+    User_ID CHAR(10) ,
+    Stock_Symbol VARCHAR(30),
     Purchase_Time TIMESTAMP,
-    Invested_Price DECIMAL(10,2) NOT NULL,
+    Buy_Price DECIMAL(10,2) NOT NULL,
     Qty INT NOT NULL,
-    PRIMARY KEY(User_ID,Stock_Symbol,Purchase_Time)
+    PRIMARY KEY(User_ID,Stock_Symbol,Purchase_Time),
+
+    FOREIGN KEY(User_ID) REFERENCES Users(User_ID)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+
+     FOREIGN KEY(Stock_Symbol) REFERENCES Stocks(Stock_Symbol)
+     ON UPDATE CASCADE
+     ON DELETE CASCADE
 );
 
 CREATE TABLE Holding_History (
-    User_ID CHAR(10) FOREIGN KEY REFERENCES Users(User_ID),
-    Transaction_ID CHAR(12) FOREIGN KEY REFERENCES Wallet_Stock(Transaction_ID),
-    To_time_stamp TIMESTAMP NOT NULL,
-    From_time_stamp TIMESTAMP NOT NULL,
+    User_ID CHAR(10) ,
+    Transaction_ID CHAR(12),
+    Purchase_time_stamp TIMESTAMP NOT NULL,
+    Sold_time_stamp TIMESTAMP NOT NULL,
     Sold_Price DECIMAL(10,2) NOT NULL,
     Bought_Price DECIMAL(10,2) NOT NULL,
-    Profit_loss DECIMAL(10,2) NOT NULL,
-    Amount DECIMAL(10,2) NOT NULL,
-    PRIMARY KEY (User_ID,Transaction_ID)
+    Qty INT NOT NULL,
+    PRIMARY KEY (User_ID,Transaction_ID),
+    
+    FOREIGN KEY(User_ID) REFERENCES Users(User_ID)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+
+    FOREIGN KEY(Transaction_ID) REFERENCES Wallet_Stock(Transaction_ID)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
 );
 
 CREATE TABLE Stocks (
-    Stock_Symbol VARCHAR(10) PRIMARY KEY,
-    Name VARCHAR(30) UNIQUE NOT NULL,
-    Type VARCHAR(20) , 
+    Stock_Symbol VARCHAR(30) PRIMARY KEY,
+    Sname VARCHAR(60) UNIQUE NOT NULL,
+    Stype VARCHAR(20) , 
     Highest DECIMAL(10,2),
     Lowest DECIMAL(10,2),
-    Exchange VARCHAR(50) NOT NULL,
-    CIN CHAR(21) FOREIGN KEY REFERENCES Company(CIN)
+    Exchange VARCHAR(20) NOT NULL,
+    CIN CHAR(21),
+    FOREIGN KEY(CIN) REFERENCES Company(CIN)
+    ON UPDATE CASCADE
+    ON DELETE SET NULL
 );
 
 CREATE TABLE Stock_History (
     Time_Stamp TIMESTAMP NOT NULL,
-    Stock_Symbol VARCHAR(10) FOREIGN KEY REFERENCES Stocks(Stock_Symbol),
+    Stock_Symbol VARCHAR(30),
     Inc_Dec DECIMAL(10,2) NOT NULL,
     Price DECIMAL(10,2) NOT NULL,
     Open_Price DECIMAL(10,2) NOT NULL,
     Previous_Close DECIMAL(10,2) NOT NULL,
     Volume VARCHAR(15) NOT NULL,
-    PRIMARY KEY(Time_Stamp,Stock_Symbol)
+    PRIMARY KEY(Time_Stamp,Stock_Symbol),
+    FOREIGN KEY(Stock_Symbol) REFERENCES Stocks(Stock_Symbol)
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE Member_of (
-    Stock_Symbol VARCHAR(10) FOREIGN KEY REFERENCES Stocks(Stock_Symbol),
-    Group_Name VARCHAR(30) FOREIGN KEY REFERENCES Stock_Group(Group_Name),
-    PRIMARY KEY(Stock_Symbol,Group_Name)
+    Stock_Symbol VARCHAR(30),
+    Group_symbol VARCHAR(30),
+    PRIMARY KEY(Stock_Symbol,Group_Name),
+    FOREIGN KEY(Stock_Symbol) REFERENCES Stocks(Stock_Symbol)
+    ON UPDATE CASCADE,
+    FOREIGN KEY(Group_symbol) REFERENCES Stock_Group(Group_symbol)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
 );
 
-CREATE TABLE Stock_Grup (
-    Group_Name VARCHAR(30) PRIMARY KEY,
+CREATE TABLE Stock_Group (
+    Group_Name VARCHAR(60) PRIMARY KEY,
+    Group_symbol VARCHAR(30) PRIMARY KEY,
     Lowest DECIMAL(10,2) NOT NULL,
     Highest DECIMAL(10,2) NOT NULL,
-    Price DECIMAL(10,2) NOT NULL,
-    Open_Price DECIMAL(10,2) NOT NULL,
-    Close_Price DECIMAL(10,2) NOT NULL,
     Stock_Exchange VARCHAR(10) NOT NULL
 );
 
+
 CREATE TABLE Stock_Group_History (
     Time_Stamp TIMESTAMP NOT NULL,
-    Group_Name VARCHAR(30) NOT NULL FOREIGN KEY REFERENCES Stock_Group(Group_Name),
+    Group_Name VARCHAR(30) NOT NULL,
     Inc_Dec DECIMAL(10,2) NOT NULL,
     Price DECIMAL(10,2) NOT NULL,
     Open_Price DECIMAL(10,2) NOT NULL,
-    Previous_Close DECIMAL(10,2) NOT NULL,
-    PRIMARY KEY(Time_Stamp,Group_Name)
+    Close_Price DECIMAL(10,2) NOT NULL,
+    PRIMARY KEY(Time_Stamp,Group_Name),
+    FOREIGN KEY(Group_Name) REFERENCES Stock_Group(Group_Name)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
 );
 
 CREATE TABLE Company (
     CIN CHAR(21) PRIMARY KEY,
-    Name VARCHAR(30) NOT NULL,
-    CEO VARCHAR(30),
-    Market_Capital VARCHAR(15),
-    Revenue VARCHAR(20)
+    Cname VARCHAR(50) NOT NULL,
+    CEO VARCHAR(50),
+    Market_Capital VARCHAR(30),
+    Revenue VARCHAR(30)
 );
 
 CREATE TABLE Sector(
-    Sector_Name VARCHAR(20),
-    CIN  CHAR(21) FOREIGN KEY REFERENCES Company(CIN),
-    PRIMARY KEY(Sector_Name,CIN)
+    Sector_Name VARCHAR(30),
+    CIN  CHAR(21),
+    PRIMARY KEY(Sector_Name,CIN),
+    FOREIGN KEY(CIN) REFERENCES Company(CIN)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
 
 );
 
-CREATE TABLE Order (
+CREATE TABLE Orders (
     Order_ID CHAR(10) PRIMARY KEY,
     Order_time TIMESTAMP NOT NULL,
-    Stop_Price DECIMAL(10,2) NOT NULL,
+    User_ID CHAR(10) NOT NULL,
+    Stock_Symbol VARCHAR(30),
+    Trading_type VARCHAR(10) NOT NULL,
+    Price DECIMAL(10,2) NOT NULL,
+    Qty INT NOT NULL,
     Status CHAR(1) NOT NULL,
-    User_ID CHAR(10) NOT NULL FOREIGN KEY REFERENCES Users(User_ID),
-    Stock_Symbol VARCHAR(10) NOT NULL REFERENCES Stocks(Stock_Symbol)
+    Order_type VARCHAR(10) NOT NULL,
+    FOREIGN KEY(User_ID) REFERENCES Users(User_ID)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+    FOREIGN KEY(Stock_Symbol) REFERENCES Stocks(Stock_Symbol)
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE News (
-    CIN CHAR(21) FOREIGN KEY REFERENCES Company(CIN),
-    Title VARCHAR(50),
-    Link VARCHAR(50),
+    CIN CHAR(21),
+    Title TEXT,
     Description TEXT,
-    PRIMARY KEY (CIN,Title)
+    PRIMARY KEY (CIN,Title),
+    FOREIGN KEY(CIN) REFERENCES Company(CIN)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
 );
 
 CREATE TABLE IPO (
     IPO_Name VARCHAR(50),
     Open_Date date,
-    CIN CHAR(21) FOREIGN KEY REFERENCES Company(CIN),
-    Issue_Price DECIMAL(10,2) NOT  NULL,
+    CIN CHAR(21),
+    Issue_Price VARCHAR(20) NOT  NULL,
     Close_Date DATE NOT NULL,
     Lot_Size INT NOT NULL,
     Issue_Size VARCHAR(20),
-    Minimum Invest DECIMAL(10,2) NOT NULL,
+    Minimum_Invest DECIMAL(10,2) NOT NULL,
     Listing_Date date,
-    PRIMARY KEY(IPO_Name,Open_Date)
+    PRIMARY KEY(IPO_Name,Open_Date),
+    FOREIGN KEY(CIN) REFERENCES Company(CIN)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
 );
 
 
