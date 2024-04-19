@@ -100,7 +100,7 @@ CREATE TABLE Holding_History (
     Sold_Price DECIMAL(10,2) NOT NULL,
     Bought_Price DECIMAL(10,2) NOT NULL,
     Qty INT NOT NULL,
-    PRIMARY KEY (User_ID,Transaction_ID),
+    PRIMARY KEY (Transaction_ID),
     
     FOREIGN KEY(User_ID) REFERENCES Users(User_ID)
     ON UPDATE CASCADE
@@ -149,7 +149,7 @@ CREATE TABLE Member_of (
 );
 
 CREATE TABLE Stock_Group (
-    Group_Name VARCHAR(60) PRIMARY KEY,
+    Group_Name VARCHAR(60),
     Group_symbol VARCHAR(30) PRIMARY KEY,
     Lowest DECIMAL(10,2) NOT NULL,
     Highest DECIMAL(10,2) NOT NULL,
@@ -159,13 +159,13 @@ CREATE TABLE Stock_Group (
 
 CREATE TABLE Stock_Group_History (
     Time_Stamp TIMESTAMP NOT NULL,
-    Group_Name VARCHAR(30) NOT NULL,
+    Group_symbol VARCHAR(30) NOT NULL,
     Inc_Dec DECIMAL(10,2) NOT NULL,
     Price DECIMAL(10,2) NOT NULL,
     Open_Price DECIMAL(10,2) NOT NULL,
     Close_Price DECIMAL(10,2) NOT NULL,
-    PRIMARY KEY(Time_Stamp,Group_Name),
-    FOREIGN KEY(Group_Name) REFERENCES Stock_Group(Group_Name)
+    PRIMARY KEY(Time_Stamp,Group_symbol),
+    FOREIGN KEY(Group_symbol) REFERENCES Stock_Group(Group_symbol)
     ON UPDATE CASCADE
     ON DELETE CASCADE
 );
@@ -225,7 +225,7 @@ CREATE TABLE IPO (
     Issue_Size VARCHAR(20),
     Minimum_Invest DECIMAL(10,2) NOT NULL,
     Listing_Date date,
-    PRIMARY KEY(IPO_Name,Open_Date),
+    PRIMARY KEY(IPO_Name),
     FOREIGN KEY(CIN) REFERENCES Company(CIN)
     ON UPDATE CASCADE
     ON DELETE CASCADE
