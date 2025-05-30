@@ -1,0 +1,44 @@
+[
+  {
+    "symbol": "AAPL",
+    "price": 192.45,
+    "changePercent": 1.23,
+    "direction": "up"
+  },
+  {
+    "symbol": "GOOGL",
+    "price": 2785.67,
+    "changePercent": -0.87,
+    "direction": "down"
+  },
+  {
+    "symbol": "TSLA",
+    "price": 678.90,
+    "changePercent": 2.14,
+    "direction": "up"
+  },
+  {
+    "symbol": "AMZN",
+    "price": 3345.50,
+    "changePercent": -1.12,
+    "direction": "down"
+  },
+  {
+    "symbol": "MSFT",
+    "price": 310.88,
+    "changePercent": 0.56,
+    "direction": "up"
+  },
+  {
+    "symbol": "NFLX",
+    "price": 405.33,
+    "changePercent": -0.45,
+    "direction": "down"
+  },
+  {
+    "symbol": "NVDA",
+    "price": 745.22,
+    "changePercent": 3.78,
+    "direction": "up"
+  }
+]
