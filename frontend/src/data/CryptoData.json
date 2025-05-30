@@ -1,0 +1,58 @@
+[
+  {
+    "name": "Ripple",
+    "symbol": "xrp",
+    "pair": "XRP/USD",
+    "price": "9,124.05",
+    "change": "-0.12%",
+    "changeColor": "text-red-500"
+  },
+  {
+    "name": "Ethereum",
+    "symbol": "eth",
+    "pair": "ETH/USD",
+    "price": "5,124.05",
+    "change": "+1.12%",
+    "changeColor": "text-green-500"
+  },
+  {
+    "name": "Zcash",
+    "symbol": "zec",
+    "pair": "ZEC/USD",
+    "price": "1,124.05",
+    "change": "-0.02%",
+    "changeColor": "text-red-500"
+  },
+  {
+    "name": "Litecoin",
+    "symbol": "ltc",
+    "pair": "LTC/USD",
+    "price": "1,124.05",
+    "change": "-0.02%",
+    "changeColor": "text-red-500"
+  },
+  {
+    "name": "Bitcoin",
+    "symbol": "btc",
+    "pair": "BTC/USD",
+    "price": "41,235.12",
+    "change": "+2.45%",
+    "changeColor": "text-green-500"
+  },
+  {
+    "name": "Dogecoin",
+    "symbol": "doge",
+    "pair": "DOGE/USD",
+    "price": "0.1245",
+    "change": "-0.45%",
+    "changeColor": "text-red-500"
+  },
+  {
+    "name": "Cardano",
+    "symbol": "ada",
+    "pair": "ADA/USD",
+    "price": "0.587",
+    "change": "+0.87%",
+    "changeColor": "text-green-500"
+  }
+]
